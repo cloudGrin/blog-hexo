@@ -1,0 +1,23 @@
+[[headers]]
+  for = "/css/*"
+
+  [headers.values]
+    cache-control = "max-age=31536000"
+
+[[headers]]
+  for = "/js/*"
+
+  [headers.values]
+    cache-control = "max-age=31536000"
+
+[[headers]]
+  for = "/lib/*"
+
+  [headers.values]
+    cache-control = "max-age=31536000"
+
+[[headers]]
+  for = "/images/*"
+
+  [headers.values]
+    cache-control = "max-age=31536000"
