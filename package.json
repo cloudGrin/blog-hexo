@@ -5,9 +5,10 @@
   "scripts": {
     "build": "hexo generate",
     "clean": "hexo clean",
-    "deploy": "npm run cpr && hexo deploy",
+    "deploy": "npm run netlify && hexo deploy",
     "server": "hexo server",
-    "cpr": "cpr ./netlify.toml ./public/netlify.toml"
+    "cpr": "cpr ./netlify.toml ./public/netlify.toml",
+    "netlify": "npm run clean && npm run build && npm run cpr"
   },
   "hexo": {
     "version": "4.2.0"
