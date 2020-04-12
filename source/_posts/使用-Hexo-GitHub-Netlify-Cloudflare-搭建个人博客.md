@@ -12,7 +12,7 @@ tags:
 
 对于程序员，写博客的重要性不言而喻，借用网上的一张图（侵删）：
 
-![](/images/build_blog/1.png)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/1.png)
 
 而且只要一杯瑞幸的钱😄（买域名，不买的话完全是白嫖啊）就可以拥有自己的一篇空间，想想就很兴奋，是不是。
 
@@ -208,27 +208,27 @@ git push -u origin master
 * 注册 [Netlify](https://www.netlify.com/) 并登陆
 * 创建 site
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e180d6718091?w=2462&h=878&f=png&s=103513)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/2.png)
 
 * 连接 github
  
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e18adc5e4c7f?w=2430&h=1276&f=png&s=156148)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/3.png)
 
 * 选择刚刚上传的项目
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e19d3ae96aeb?w=2442&h=1432&f=png&s=200574)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/4.png)
 
 * 选择构建分支、构建命令和静态文件目录，点击 Deploy site 发布
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e1ca7849cacd?w=1794&h=1840&f=png&s=201688)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/5.png)
 
 * 等构建结束后，会看到这里有个网址，打开就是你的博客了
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e249388b99b0?w=2472&h=794&f=png&s=124685)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/6.png)
 
 * 可以点击下方 Domain settings，自定义二级域名
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e25dbcb09f6e?w=2542&h=1010&f=png&s=172372)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/7.png)
 
 * 可以欣赏你的博客了
 
@@ -240,11 +240,11 @@ git push -u origin master
 * 购买域名
 * 配置域名解析
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e313e9bb33c7?w=3352&h=1266&f=png&s=375481)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/8.png)
 
 * 按照下图设置 CNAME， 指向 Netlify 里设置的域名
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e310fdcf2dcb?w=2916&h=812&f=png&s=174761)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/9.png)
 
 * 稍等会就可以正常访问了
 
@@ -252,11 +252,11 @@ git push -u origin master
 * 注册 [Cloudflare](https://www.cloudflare.com/zh-cn/) 并登陆
 * 添加站点
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e88697bac2cd?w=1888&h=568&f=png&s=62298)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/10.png)
 * 选择免费套餐
 * 添加 DNS 记录
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e8a970e71352?w=1988&h=1738&f=png&s=288025)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/11.png)
 
 **坑 1：**
 
@@ -265,7 +265,7 @@ DNS 的作用就是把域名翻译成 IP 地址，所以一般在做域名解析
 
 一般情况下 Cloudflare 会检测出来几条 DNS 记录，类型大多数是A，或者AAAA，由于我们是转发，所以应该是 CNAME 类型才对。所以全部删除，手动添加。
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716e9c9e62501c5?w=2118&h=768&f=png&s=120496)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/12.png)
 
 如图，把名称替换成你的域名，内容填你的博客的 Netlify 地址。 www 的名称不用修改，修改内容同上。
 
@@ -274,13 +274,13 @@ DNS 的作用就是把域名翻译成 IP 地址，所以一般在做域名解析
 * 修改 NS
 
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716ea4095323100)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/13.png)
 
 在你的域名服务商那里修改 dns 解析服务器为 cloudflare 提供的地址，修改完成后点击完成。
 
 * 设置强制 HTTPS，文件压缩等
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716ea63ab1ed810?w=1908&h=1752&f=png&s=257362)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/14.png)
 
 * 点击完成，设置完毕，NS 方式修改的生效时间会比较长一些，官网上说24小时以内，不过一般不会这么长时间，耐心等待下。成功之后Cloudflare会发一封邮件给你，或者重新登录控制台也能看到。
 
@@ -288,7 +288,7 @@ DNS 的作用就是把域名翻译成 IP 地址，所以一般在做域名解析
 
 返回头部的 server 字段从 Netlify 变成了 cloudflare，速度应该快很多了。
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716eabfa7ef57ff?w=1636&h=950&f=png&s=228482)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/15.png)
 
 🎉恭喜，你的博客已经搭建完毕，现在可以开始写文章了。
 
@@ -318,15 +318,15 @@ hexo s
 
 打开博客发现并没有更新主题，查看netlify 构建日志发现失败了，提示没有 submodule 的主题项目的权限：
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716ec35cf72b711?w=2446&h=1832&f=png&s=398373)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/16.png)
 
 需要添加 Deploy key到 GitHub
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716ec402beb3e2b?w=2530&h=1442&f=png&s=272853)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/17.png)
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716ec4815969fd5?w=2086&h=1310&f=png&s=329873)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/18.png)
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716ec4b12faa419?w=2504&h=1224&f=png&s=210531)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/19.png)
 重新构建，成功🎉，线上博客主题已更新。
 
 #### 添加博客评论 | Gitalk
@@ -335,13 +335,13 @@ hexo s
 
 callback 务必填写你的域名，这样评论里 github 登录后才能正确回跳到你的博客。
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716eca1ef56278b?w=1206&h=1180&f=png&s=121840)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/20.png)
 
 **坑 3**
 
 部署到线上后，在你的文章底部就会出现gitalk的组件，但是会发现存在这样的情况：
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716eceb002d409a?w=2050&h=666&f=png&s=65234)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/21.png)
 
 有的会报错 <span style="color: red">network error</span>。
 
@@ -382,15 +382,15 @@ https://yourwebsite.com/p/37232.html
 
 * 在你的 GitHub 博客项目中添加 issue
 
-* ![](https://user-gold-cdn.xitu.io/2020/4/12/1716edebf66977b0?w=1986&h=856&f=png&s=161608)
+* ![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/22.png)
 
 * 添加 label 为 Gitalk 和你的文章path（比如/p/37232）
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716ee2051589c33?w=2140&h=1570&f=png&s=295948)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/23.png)
 
 * 然后重新提交commit，等待 Netlify 构建完毕，查看你的文章底部 Gitalk 是否已经可以评论
 
-![](https://user-gold-cdn.xitu.io/2020/4/12/1716ee3e9e9b035b?w=2216&h=836&f=png&s=91071)
+![](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/build_blog/24.png)
 
 ### 完结
 
