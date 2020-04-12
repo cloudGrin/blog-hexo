@@ -6,7 +6,7 @@ categories: 前端
 tags: Javascript
 ---
 
-![beach](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/WechatIMG5.jpeg?x-oss-process=image/resize,w_600,limit_0)
+![beach](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/big_this.jpeg?x-oss-process=image/resize,w_600,limit_0)
 
 ## 前言
 关于 Javascript 的 this 相信大家已经阅读过一些关于它的文章，也在实践中有些知识积累，作为 JavaScript 中最令人困惑的机制之一，即便是一些老练的开发也不一定完全掌握 this 这个神奇的东西，今天我结合 ES6+ 的一些语法重新梳理下 this，希望对大家有所帮助。

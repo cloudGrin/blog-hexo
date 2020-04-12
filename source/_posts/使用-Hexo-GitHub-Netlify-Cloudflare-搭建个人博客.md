@@ -6,7 +6,7 @@ date: 2020-04-12 23:08:58
 tags:
 ---
 
-![bird](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/WechatIMG20.jpeg?x-oss-process=image/resize,w_600,limit_0)
+![bird](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/big_blog.jpeg?x-oss-process=image/resize,w_600,limit_0)
 
 ## 前言
 
