@@ -8,7 +8,7 @@ tags:
 
 ![bird](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/big_blog.jpeg?x-oss-process=image/resize,w_600,limit_0)
 
-## 前言
+### 前言
 
 对于程序员，写博客的重要性不言而喻，借用网上的一张图（侵删）：
 
