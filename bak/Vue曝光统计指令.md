@@ -1,0 +1,241 @@
+---
+title: Vue曝光统计指令
+abbrlink: b373
+date: 2020-05-17 14:28:02
+categories: 前端
+tags: [Javascript,Vue]
+---
+
+![beach](https://cloudgrin.oss-cn-shanghai.aliyuncs.com/images/big_intersection_observer.jpeg?x-oss-process=image/resize,w_600,limit_0)
+
+## 什么时候需要埋点：
+* 当一款新产品规划完成需要看数据时；
+* 某个功能改版规划完成需要看数据时；
+* ABTest需要判断哪种方案更好时；
+* 需要看H5活动页的统计数据时；
+* 需要看第三方投放的引流效果时；
+* 以及今天我们将谈论的广告位曝光埋点；
+* ...
+
+## 需求
+我司主要是做电商业务，最近卖出去了一些广告位，想要统计这些广告位的曝光情况，然后就可以理直气壮的拿出数据向商家收钱了。
+
+产品提出需求方案是广告位漏出 1/4 且连续时间达到 2 秒，广告位类型主要是轮播和 banner。
+
+## 方案
+* 监听滚动（节流），实时计算广告位与视窗的位置。
+* 使用定时器定时计算页面广告位与视窗的位置。
+
+但这两个方案有一个弊端就是都需要调用 Element.getBoundingClientRect()，这个API在主线程上运行且会引起页面回流，极易拖慢整个网站的性能。
+
+其实统计曝光和图片懒加载一样，非常适合使用 [IntersectionObserver](https://developer.mozilla.org/zh-CN/docs/Web/API/Intersection_Observer_API) 这个原生API。
+
+Intersection Observer API 会注册一个回调方法，每当期望被监视的元素进入或者退出另外一个元素的时候(或者浏览器的视口)该回调方法将会被执行，或者两个元素的交集部分大小发生变化的时候回调方法也会被执行。通过这种方式，网站将不需要为了监听两个元素的交集变化而在主线程里面做任何操作，并且浏览器可以帮助我们优化和管理两个元素的交集变化。
+
+根据我们的需要只要针对性的再增加时间的统计就可以了。
+
+## 实现思路
+
+封装vue指令，如果你使用react，也可以修改为hoc。
+
+由于Intersection Observer API[兼容性](https://www.caniuse.com/#search=interS)不好，尤其是IOS 12.2以上才支持，所以需要使用官方的 [polyfill垫片](https://www.npmjs.com/package/intersection-observer)。
+
+> 除了完成现有的需求之外，我们在开发时也要考虑到实际使用，以及业务拓展的情况。比如产品经理要求有的广告位只上报一次，有的曝光一次上报一次，下拉刷新重置当前页面所有统计，还有我猜会不会需要支持第一次曝光时间是2秒，之后修改时间的情况，毕竟产品经理的脑回路和开发不一样，我们最好的是在第一次开发的时候把这些想到的情况都自己过一遍，合理的就一次开发掉。
+
+## 代码实现
+
+```js
+// observe-exposure.js
+
+/**
+ * v-exposure="callback"
+ * v-exposure="{callback,time:2000,disabled:false,once:false,intersection:{root:null,rootMargin:'0',threshold:0}}"
+ * @description 曝光指令（漏出面积比例 and 达到多长时间）
+ * @param {function} callback(entry) 曝光回调
+ *****************************@param {object} entry IntersectionObserverEntry对象
+ * @param {number} time @default 2000 曝光持续时间
+ * @param {boolean} disabled @default false 是否禁用（true->false 可以重新开启曝光检测，使用方式：在callback时置为true，当需要重新观察时改为false）
+ * @param {boolean} once @default false 只曝光一次
+ * @param {object} intersection IntersectionObserver 的 option
+ */
+
+import 'intersection-observer' // 兼容 polyfill
+import { processCallbackOptions, deepEqual } from './util.js'
+IntersectionObserver.prototype['THROTTLE_TIMEOUT'] = 300 // 兼容时 节流 300ms触发一次
+
+class Exposure {
+  constructor (el, options, vnode) {
+    this._el = el // 被观察元素
+    this._options = null
+    this._observer = null // 观察者
+    this._frozen = false // 只触发一次曝光回调（设置了once）
+    this._timer = null // 定时器ID
+    this._callback = null // 曝光回调
+    this._oldResult = undefined // 出现 or 隐藏 (对于root)
+    this.createObserver(options, vnode) // 创造观察者
+  }
+
+  // 曝光交集边界值
+  get _threshold () {
+    return this._options.intersection?.threshold ?? 0
+  }
+
+  /**
+   * 创造观察者
+   * 1. 初始化
+   * 2. 指令入参更新
+   */
+  createObserver (options, vnode) {
+    if (this._observer) {
+      // 销毁之前的观察者
+      this.destroyObserver()
+    }
+    if (this._frozen) {
+      // 设置了once，且已经曝光
+      return
+    }
+    // 处理option（直传callback和对象模式）
+    this._options = processCallbackOptions(options)
+    this._callback = (entry) => {
+      // 曝光回调
+      this._options.callback(entry)
+      if (this._options.once) {
+        // 设置了once，停止观察
+        this.destroyObserver()
+        this._frozen = true
+      }
+    }
+    this._oldResult = undefined
+    this._observer = new IntersectionObserver(entries => {
+      let entry = entries[0]
+      const result = entry.isIntersecting && entry.intersectionRatio >= this._threshold
+      if (result !== this._oldResult) {
+        this._oldResult = result
+        if (result) {
+          // 显示（对于root）切换
+          this._timer = setTimeout(() => {
+            this._callback(entry)
+          }, this._options.time ?? 2000)
+        } else {
+          // 隐藏（对于root）切换
+          clearTimeout(this._timer)
+          this._timer = null
+        }
+      }
+    }, this._options.intersection)
+    // 渲染完成后观察
+    vnode.context.$nextTick(() => {
+      this._observer.observe(this._el)
+    })
+  }
+  // 销毁观察者
+  destroyObserver () {
+    if (this._observer) {
+      this._observer.disconnect()
+      this._observer = null
+    }
+    if (this._timer) {
+      clearTimeout(this._timer)
+      this._timer = null
+    }
+  }
+
+  /**
+   * 解冻
+   * 可以使设置了once的已曝光元素重新接受曝光检测
+   */
+  resetFrozen () {
+    this._frozen = false
+  }
+}
+
+export default {
+  bind (el, { value }, vnode) {
+    if (!value || value?.disabled) return
+    if (typeof value === 'function' || ((value instanceof Object) && typeof value.callback === 'function')) {
+      const observer = new Exposure(el, value, vnode)
+      el._vue_exposure = observer
+    } else {
+      console.warn('[v-exposure] You should pass in a value of type function or an object containing a callback of type function. ')
+    }
+  },
+  update (el, { value, oldValue }, vnode) {
+    // 值未改变（vnode更新）
+    if (deepEqual(value, oldValue)) return
+    let observer = el._vue_exposure
+    if (observer && (!value || value?.disabled)) {
+      observer.destroyObserver()
+      return
+    }
+    if (typeof value === 'function' || ((value instanceof Object) && typeof value.callback === 'function')) {
+      if (observer) {
+        // 更新指令传值
+        if (value?.disabled === false && oldValue.disabled === true) {
+          // 如果设置了once，只有disabled被修改为false，才会解除冻结
+          // 之前未曝光的不受disabled修改为false影响，会被createObserver()更新曝光设置（重新生成新的观察者）
+          // 之前已经曝光的会重新接受曝光检测，也会更新新的option创建观察者
+          observer.resetFrozen()
+        }
+        observer.createObserver(value, vnode)
+      } else {
+        observer = new Exposure(el, value, vnode)
+        el._vue_exposure = observer
+      }
+    } else {
+      console.warn('[v-exposure] You should pass in a value of type function or an object containing a callback of type function. ')
+      observer && observer.destroyObserver()
+    }
+  },
+  unbind (el) {
+    const observer = el._vue_exposure
+    if (observer) {
+      observer.destroyObserver()
+      delete el._vue_exposure
+    }
+  }
+}
+
+```
+
+```js
+// util.js
+
+// 处理option（直传callback和对象模式）
+export function processCallbackOptions (value) {
+  let options
+  if (typeof value === 'function') {
+    options = {
+      callback: value
+    }
+  } else {
+    options = value
+  }
+  return options
+}
+
+// 判断两值是否相等
+export function deepEqual (val1, val2) {
+  if (val1 === val2) return true
+  if (typeof val1 === 'object') {
+    for (const key in val1) {
+      if (!deepEqual(val1[key], val2[key])) {
+        return false
+      }
+    }
+    return true
+  }
+  return false
+}
+```
+
+## 未支持功能
+* 目前指令做的是满足条件后调用传入的callback，你也可以根据需要改成指令直接调用API，把需要上报的数据传入指令或者dataset
+* 对于ToC项目，由于用户体量巨大不可能曝光一次就上报一次，这样对服务器压力🍐会很大，所以我们需要缓存，定时批量上报。
+
+> 以上第二点，定时批量上报会涉及到一种特殊场景，就是待上报队列还未清空，结果用户关闭了浏览器/webview，导致代码没法执行的情况。目前想到几种方案：1. 不考虑时效性的情况下，存储到localStorage，下次应用启动时上报；2. webview下让native支持在后台进程中上报 3. 使用 [sendBeacon](https://developer.mozilla.org/zh-CN/docs/Web/API/Navigator/sendBeacon) API
+
+## 参考文献
+
+* [MDN](https://developer.mozilla.org/zh-CN/docs/Web)
+
+* [Vue 指令](https://cn.vuejs.org/v2/guide/custom-directive.html)
