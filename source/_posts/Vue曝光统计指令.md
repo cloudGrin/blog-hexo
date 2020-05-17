@@ -29,9 +29,9 @@ tags: [Javascript,Vue]
 <p style="padding-top: 8px; padding-bottom: 8px; letter-spacing: 2px; font-size: 14px; word-spacing: 2px; margin: 0px; line-height: 26px; color: #595959;">除了完成现有的需求之外，我们在开发时也要考虑到实际使用，以及业务拓展的情况。比如产品经理要求有的广告位只上报一次，有的曝光一次上报一次，下拉刷新重置当前页面所有统计，还有我猜会不会需要支持第一次曝光时间是2秒，之后修改时间的情况，毕竟产品经理的脑回路和开发不一样，我们最好的是在第一次开发的时候把这些想到的情况都自己过一遍，合理的就一次开发掉。</p>
 <span style="float: right; color: RGBA(64, 184, 250, .5);">❞</span></blockquote>
 <h2 data-tool="mdnice编辑器" style="margin-top: 30px; margin-bottom: 15px; padding: 0px; font-weight: bold; color: black; font-size: 22px; display: block; border-bottom: 4px solid #40B8FA;"><span class="prefix" style="display: flex; width: 20px; height: 20px; background-size: 20px 20px; background-image: url(https://imgkr.cn-bj.ufileos.com/15fdfb3c-b350-4da9-928e-5f8c506ec325.png); margin-bottom: -22px;"></span><span class="content" style="display: flex; color: #40B8FA; font-size: 20px; margin-left: 25px;">代码实现</span><span class="suffix" style="display: flex; box-sizing: border-box; width: 200px; height: 10px; border-top-left-radius: 20px; background: RGBA(64, 184, 250, .5); color: rgb(255, 255, 255); font-size: 16px; letter-spacing: 0.544px; justify-content: flex-end; float: right; margin-top: -10px; box-sizing: border-box !important; overflow-wrap: break-word !important;"></span></h2>
-<pre class="custom" data-tool="mdnice编辑器" style="margin-top: 10px; margin-bottom: 10px;"><code class="hljs" style="overflow-x: auto; padding: 16px; color: #383a42; background: #fafafa; display: block; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border-radius: 0px; font-size: 12px; -webkit-overflow-scrolling: touch; letter-spacing: 0px;"><span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// observe-exposure.js</span>
+<pre class="custom" data-tool="mdnice编辑器" style="margin-top: 10px; margin-bottom: 10px;"><code class="hljs" style="overflow-x: auto; padding: 16px; color: #383a42; background: #fafafa; display: block; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border-radius: 0px; font-size: 12px; -webkit-overflow-scrolling: touch; letter-spacing: 0px;"><span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// observe-exposure.js</span>
 <span/>
-<span/><span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">/**
+<span/><span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">/**
 <span/> * v-exposure="callback"
 <span/> * v-exposure="{callback,time:2000,disabled:false,once:false,intersection:{root:null,rootMargin:'0',threshold:0}}"
 <span/> * @description 曝光指令（漏出面积比例 and 达到多长时间）
@@ -43,48 +43,48 @@ tags: [Javascript,Vue]
 <span/> * @param {object} intersection IntersectionObserver 的 option
 <span/> */</span>
 <span/>
-<span/><span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">import</span> <span class="hljs-string" style="color: #50a14f; line-height: 26px;">'intersection-observer'</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 兼容 polyfill</span>
+<span/><span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">import</span> <span class="hljs-string" style="color: #50a14f; line-height: 26px;">'intersection-observer'</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 兼容 polyfill</span>
 <span/><span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">import</span> { processCallbackOptions, deepEqual } <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">from</span> <span class="hljs-string" style="color: #50a14f; line-height: 26px;">'./util.js'</span>
-<span/>IntersectionObserver.prototype[<span class="hljs-string" style="color: #50a14f; line-height: 26px;">'THROTTLE_TIMEOUT'</span>] = <span class="hljs-number" style="color: #986801; line-height: 26px;">300</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 兼容时 节流 300ms触发一次</span>
+<span/>IntersectionObserver.prototype[<span class="hljs-string" style="color: #50a14f; line-height: 26px;">'THROTTLE_TIMEOUT'</span>] = <span class="hljs-number" style="color: #986801; line-height: 26px;">300</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 兼容时 节流 300ms触发一次</span>
 <span/>
 <span/><span class="hljs-class" style="line-height: 26px;"><span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">class</span> <span class="hljs-title" style="color: #c18401; line-height: 26px;">Exposure</span> </span>{
 <span/>  <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">constructor</span> (el, options, vnode) {
-<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._el = el <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 被观察元素</span>
+<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._el = el <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 被观察元素</span>
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._options = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">null</span>
-<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._observer = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">null</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 观察者</span>
-<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._frozen = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">false</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 只触发一次曝光回调（设置了once）</span>
-<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._timer = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">null</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 定时器ID</span>
-<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._callback = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">null</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 曝光回调</span>
-<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._oldResult = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">undefined</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 出现 or 隐藏 (对于root)</span>
-<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>.createObserver(options, vnode) <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 创造观察者</span>
+<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._observer = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">null</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 观察者</span>
+<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._frozen = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">false</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 只触发一次曝光回调（设置了once）</span>
+<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._timer = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">null</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 定时器ID</span>
+<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._callback = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">null</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 曝光回调</span>
+<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._oldResult = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">undefined</span> <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 出现 or 隐藏 (对于root)</span>
+<span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>.createObserver(options, vnode) <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 创造观察者</span>
 <span/>  }
 <span/>
-<span/>  <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 曝光交集边界值</span>
+<span/>  <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 曝光交集边界值</span>
 <span/>  <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">get</span> _threshold () {
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">return</span> <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._options.intersection?.threshold ?? <span class="hljs-number" style="color: #986801; line-height: 26px;">0</span>
 <span/>  }
 <span/>
-<span/>  <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">/**
+<span/>  <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">/**
 <span/>   * 创造观察者
 <span/>   * 1. 初始化
 <span/>   * 2. 指令入参更新
 <span/>   */</span>
 <span/>  createObserver (options, vnode) {
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (<span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._observer) {
-<span/>      <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 销毁之前的观察者</span>
+<span/>      <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 销毁之前的观察者</span>
 <span/>      <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>.destroyObserver()
 <span/>    }
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (<span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._frozen) {
-<span/>      <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 设置了once，且已经曝光</span>
+<span/>      <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 设置了once，且已经曝光</span>
 <span/>      <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">return</span>
 <span/>    }
-<span/>    <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 处理option（直传callback和对象模式）</span>
+<span/>    <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 处理option（直传callback和对象模式）</span>
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._options = processCallbackOptions(options)
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._callback = <span class="hljs-function" style="line-height: 26px;">(<span class="hljs-params" style="line-height: 26px;">entry</span>) =&gt;</span> {
-<span/>      <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 曝光回调</span>
+<span/>      <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 曝光回调</span>
 <span/>      <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._options.callback(entry)
 <span/>      <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (<span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._options.once) {
-<span/>        <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 设置了once，停止观察</span>
+<span/>        <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 设置了once，停止观察</span>
 <span/>        <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>.destroyObserver()
 <span/>        <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._frozen = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">true</span>
 <span/>      }
@@ -96,23 +96,23 @@ tags: [Javascript,Vue]
 <span/>      <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (result !== <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._oldResult) {
 <span/>        <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._oldResult = result
 <span/>        <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (result) {
-<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 显示（对于root）切换</span>
+<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 显示（对于root）切换</span>
 <span/>          <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._timer = setTimeout(<span class="hljs-function" style="line-height: 26px;"><span class="hljs-params" style="line-height: 26px;">()</span> =&gt;</span> {
 <span/>            <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._callback(entry)
 <span/>          }, <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._options.time ?? <span class="hljs-number" style="color: #986801; line-height: 26px;">2000</span>)
 <span/>        } <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">else</span> {
-<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 隐藏（对于root）切换</span>
+<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 隐藏（对于root）切换</span>
 <span/>          clearTimeout(<span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._timer)
 <span/>          <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._timer = <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">null</span>
 <span/>        }
 <span/>      }
 <span/>    }, <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._options.intersection)
-<span/>    <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 渲染完成后观察</span>
+<span/>    <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 渲染完成后观察</span>
 <span/>    vnode.context.$nextTick(<span class="hljs-function" style="line-height: 26px;"><span class="hljs-params" style="line-height: 26px;">()</span> =&gt;</span> {
 <span/>      <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._observer.observe(<span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._el)
 <span/>    })
 <span/>  }
-<span/>  <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 销毁观察者</span>
+<span/>  <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 销毁观察者</span>
 <span/>  destroyObserver () {
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (<span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._observer) {
 <span/>      <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">this</span>._observer.disconnect()
@@ -124,7 +124,7 @@ tags: [Javascript,Vue]
 <span/>    }
 <span/>  }
 <span/>
-<span/>  <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">/**
+<span/>  <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">/**
 <span/>   * 解冻
 <span/>   * 可以使设置了once的已曝光元素重新接受曝光检测
 <span/>   */</span>
@@ -144,7 +144,7 @@ tags: [Javascript,Vue]
 <span/>    }
 <span/>  },
 <span/>  update (el, { value, oldValue }, vnode) {
-<span/>    <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 值未改变（vnode更新）</span>
+<span/>    <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 值未改变（vnode更新）</span>
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (deepEqual(value, oldValue)) <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">return</span>
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">let</span> observer = el._vue_exposure
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (observer &amp;&amp; (!value || value?.disabled)) {
@@ -153,11 +153,11 @@ tags: [Javascript,Vue]
 <span/>    }
 <span/>    <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (<span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">typeof</span> value === <span class="hljs-string" style="color: #50a14f; line-height: 26px;">'function'</span> || ((value <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">instanceof</span> <span class="hljs-built_in" style="color: #c18401; line-height: 26px;">Object</span>) &amp;&amp; <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">typeof</span> value.callback === <span class="hljs-string" style="color: #50a14f; line-height: 26px;">'function'</span>)) {
 <span/>      <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (observer) {
-<span/>        <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 更新指令传值</span>
+<span/>        <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 更新指令传值</span>
 <span/>        <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (value?.disabled === <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">false</span> &amp;&amp; oldValue.disabled === <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">true</span>) {
-<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 如果设置了once，只有disabled被修改为false，才会解除冻结</span>
-<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 之前未曝光的不受disabled修改为false影响，会被createObserver()更新曝光设置（重新生成新的观察者）</span>
-<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 之前已经曝光的会重新接受曝光检测，也会更新新的option创建观察者</span>
+<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 如果设置了once，只有disabled被修改为false，才会解除冻结</span>
+<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 之前未曝光的不受disabled修改为false影响，会被createObserver()更新曝光设置（重新生成新的观察者）</span>
+<span/>          <span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 之前已经曝光的会重新接受曝光检测，也会更新新的option创建观察者</span>
 <span/>          observer.resetFrozen()
 <span/>        }
 <span/>        observer.createObserver(value, vnode)
@@ -180,9 +180,9 @@ tags: [Javascript,Vue]
 <span/>}
 <span/>
 <span/></code></pre>
-<pre class="custom" data-tool="mdnice编辑器" style="margin-top: 10px; margin-bottom: 10px;"><code class="hljs" style="overflow-x: auto; padding: 16px; color: #383a42; background: #fafafa; display: block; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border-radius: 0px; font-size: 12px; -webkit-overflow-scrolling: touch; letter-spacing: 0px;"><span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// util.js</span>
+<pre class="custom" data-tool="mdnice编辑器" style="margin-top: 10px; margin-bottom: 10px;"><code class="hljs" style="overflow-x: auto; padding: 16px; color: #383a42; background: #fafafa; display: block; font-family: Operator Mono, Consolas, Monaco, Menlo, monospace; border-radius: 0px; font-size: 12px; -webkit-overflow-scrolling: touch; letter-spacing: 0px;"><span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// util.js</span>
 <span/>
-<span/><span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 处理option（直传callback和对象模式）</span>
+<span/><span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 处理option（直传callback和对象模式）</span>
 <span/><span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">export</span> <span class="hljs-function" style="line-height: 26px;"><span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">function</span> <span class="hljs-title" style="color: #4078f2; line-height: 26px;">processCallbackOptions</span> (<span class="hljs-params" style="line-height: 26px;">value</span>) </span>{
 <span/>  <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">let</span> options
 <span/>  <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (<span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">typeof</span> value === <span class="hljs-string" style="color: #50a14f; line-height: 26px;">'function'</span>) {
@@ -195,7 +195,7 @@ tags: [Javascript,Vue]
 <span/>  <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">return</span> options
 <span/>}
 <span/>
-<span/><span class="hljs-comment" style="color: #a0a1a7; font-style: italic; line-height: 26px;">// 判断两值是否相等</span>
+<span/><span class="hljs-comment" style="color: #a0a1a7; font-style: normal; line-height: 26px;">// 判断两值是否相等</span>
 <span/><span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">export</span> <span class="hljs-function" style="line-height: 26px;"><span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">function</span> <span class="hljs-title" style="color: #4078f2; line-height: 26px;">deepEqual</span> (<span class="hljs-params" style="line-height: 26px;">val1, val2</span>) </span>{
 <span/>  <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (val1 === val2) <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">return</span> <span class="hljs-literal" style="color: #0184bb; line-height: 26px;">true</span>
 <span/>  <span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">if</span> (<span class="hljs-keyword" style="color: #a626a4; line-height: 26px;">typeof</span> val1 === <span class="hljs-string" style="color: #50a14f; line-height: 26px;">'object'</span>) {
